@@ -3,7 +3,7 @@ TARGET=scheme
 SOURCES = \
     type.ml \
     scheme.ml \
-	lexer.mll
+    lexer.mll
 
 OCAMLBUILD=ocamlbuild
 
