@@ -1,5 +1,5 @@
 open Parser
-
+       
 let main =
   print_endline "OCaml-Scheme: A scheme iterator of OCaml";
   print_string (match Sys.os_type with
@@ -12,8 +12,10 @@ let main =
       try
         print_string "$-> ";
         let str = read_line() in        
-        let e = Parser.expr Lexer.token (Lexing.from_string str) in
-            Printf.printf "%s\n" str                          
+        let e = Parser.expr Lexer.token (Lexing.from_string str) in begin 
+            Printf.printf "%s\n" str;
+            Type.debug e;
+          end
       with
       | _ -> print_endline ("Parsing ERROR")
     done
