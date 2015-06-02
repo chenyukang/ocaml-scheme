@@ -11,14 +11,12 @@ let main =
     while true do
       try
         print_string "$-> ";
-        let str = read_line() in
-        let l = Lexing.from_string str in
-        let r = Lexing.lexeme l in begin
-            Printf.printf "%s\n" str;
-            Printf.printf "%s\n" r
-          end
+        let str = read_line() in        
+        let e = Parser.expr Lexer.token (Lexing.from_string str) in
+            Printf.printf "%s\n" str                          
       with
-      | _ -> print_endline ("ERROR")
+      | _ -> print_endline ("Parsing ERROR")
     done
   with
   | _ -> print_endline ("ERROR")
+                       

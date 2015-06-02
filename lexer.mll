@@ -13,15 +13,10 @@ rule token = parse
          | "if"               { IF }
          | "begin"            { BEGIN }
          | "lambda"           { LAMBDA }
-         | '<'                { LESS }
-         | '>'                { LARGER }
+         | [^'(' ')' '0' - '9' ' ' '\t' '\n' '.' '\''][^' ' '\t' '\n' '(' ')']*    { SYMBOL(Lexing.lexeme lexbuf) }
          | '('                { LPAREN }
-         | ')'                { RPAREN }
-         | '+'                { PLUS }
-         | '-'                { MINUS }
-         | '*'                { TIMES }
-         | '/'                { DIV }
+         | ')'                { RPAREN }                              
          | '.'                { DOT }
-         | var                { VAR (Lexing.lexeme lexbuf) }
+         | var                { SYMBOL (Lexing.lexeme lexbuf) }
          | eof                { EOF }
 {}
