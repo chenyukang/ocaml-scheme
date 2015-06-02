@@ -2,11 +2,15 @@ open Type
 
 let global_env = ref [];;
 
-let global_lookup name =
+
+let env_lookup env name =
   List.find
     (function x -> match x with { name = n } -> n = name)
-    !global_env;;
+    env;;
 
+let global_lookup name =
+  env_lookup !global_env name             
+             
 let global_set name value =
   try
     match List.find

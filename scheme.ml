@@ -1,4 +1,5 @@
 open Parser
+open Eval
        
 let main =
   print_endline "OCaml-Scheme: A scheme iterator of OCaml";
@@ -15,6 +16,8 @@ let main =
         let e = Parser.expr Lexer.token (Lexing.from_string str) in begin 
             Printf.printf "%s\n" str;
             Type.debug e;
+            Type.show e;
+            Type.show (eval e []);
           end
       with
       | _ -> print_endline ("Parsing ERROR")
