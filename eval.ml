@@ -1,13 +1,12 @@
 open Type
 open Env
-       
-exception Runtime
+open Printf
+
+exception Runtime_error  of string
+let error msg = raise (Runtime_error msg)
 
 let rec eval exp env =
   match exp with
-    Nil | Int _ -> exp
-    | Symbol {name = n} -> match (env_lookup env n).value with
-                             Value v -> v
-                           | _ -> raise Runtime
-    | _ -> Int 2
-               
+  | Nil | Int _ -> exp
+  | Symbol s -> env_lookup env s
+  | _ -> Int 2

@@ -4,7 +4,7 @@
 %token <string> SYMBOL
 %token TRUE FALSE
 %token DEF
-%token BEGIN       
+%token BEGIN
 %token IF
 %token LAMBDA
 %token LPAREN RPAREN
@@ -23,14 +23,12 @@
 
 expr:
      INT                             { Type.Int($1) }
-  |  SYMBOL                          { Type.Symbol(Env.find $1) }
+  |  SYMBOL                          { Type.Symbol($1) }
   |  LPAREN IF expr expr expr RPAREN { Type.If($3, $4, $5) }
   |  LPAREN list RPAREN              { $2 }
-            
+
 
 list:
     expr DOT expr      {  Type.Cons($1, $3) }
   | expr list          {  Type.Cons($1, $2) }
   |                    {  Type.Nil }
-
-
