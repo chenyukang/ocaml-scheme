@@ -31,6 +31,9 @@ let global_set name value =
     in global_env := symbol :: !global_env ;
        value;;
 
+let env_init() =
+  global_env := { name = "a"; value = Int(2) } :: !global_env
+
 (* let find name = *)
 (*   try *)
 (*     global_lookup name *)

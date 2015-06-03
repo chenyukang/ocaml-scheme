@@ -8,6 +8,7 @@ let main =
                   | "Win32" -> "Ctrl-Z"
                   | _ -> "EOF") ;
   print_endline " to exit." ;
+  Env.env_init();
   try
     while true do
       try
@@ -16,7 +17,7 @@ let main =
         let e = Parser.expr Lexer.token (Lexing.from_string str) in begin
             Printf.printf "%s\n" str;
             Type.debug e;
-            Type.show (eval e []);
+            Type.show (eval e !Env.global_env);
           end
       with
       | Eval.Runtime_error msg -> print_endline msg
