@@ -12,6 +12,26 @@ type expr =
    and
      symbol = { name: string; mutable value: expr };;
 
+let car expr =
+  match expr with
+  | Cons(e1, e2) -> e1
+  | _ -> Nil
+
+let cdr expr =
+  match expr with
+  | Cons(e1, e2) -> e2
+  | _ -> Nil
+
+let rec nth expr k =
+  match expr with
+    Cons(e1, e2) -> if k = 0 then e1 else nth e2 (k - 1)
+  | _ -> Nil
+
+let sym_string expr =
+    match expr with
+    | Symbol(s) -> s
+    | _ -> raise (Type_error "sym_string")
+
 let rec print x =
   match x with
     Nil -> print_string "nil ()"

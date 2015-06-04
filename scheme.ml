@@ -15,7 +15,6 @@ let main =
         print_string "$-> ";
         let str = read_line() in
         let e = Parser.expr Lexer.token (Lexing.from_string str) in begin
-            Printf.printf "%s\n" str;
             Type.debug e;
             Type.show (eval e !Env.global_env);
           end
