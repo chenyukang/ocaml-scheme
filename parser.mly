@@ -3,7 +3,6 @@
 %token <int> INT
 %token <string> SYMBOL
 %token TRUE FALSE
-%token DEF
 %token BEGIN
 %token IF
 %token LAMBDA

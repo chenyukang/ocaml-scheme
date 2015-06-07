@@ -12,7 +12,6 @@ let env_lookup env name =
               env in
     match r with
       { name = _; value = v } -> v
-    | _ -> Nil
   with Not_found ->
     error (Printf.sprintf "%s: not found in env" name)
 
