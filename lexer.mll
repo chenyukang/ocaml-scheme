@@ -12,7 +12,7 @@ rule token = parse
          | "if"               { IF }
          | "begin"            { BEGIN }
          | "lambda"           { LAMBDA }
-         | [^'(' ')' '0' - '9' ' ' '\t' '\n' '.' '\''][^' ' '\t' '\n' '(' ')']*    { SYMBOL(Lexing.lexeme lexbuf) }
+         | [^'(' ')' '0' - '9' ' ' '\t' '\n' '.' '\''][^' ' '\t' '\n' '(' ')']* { SYMBOL(Lexing.lexeme lexbuf) }
          | '('                { LPAREN }
          | ')'                { RPAREN }
          | '.'                { DOT }

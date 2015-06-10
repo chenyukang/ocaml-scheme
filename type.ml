@@ -5,6 +5,7 @@ type expr =
   Nil
   | Int of int
   | Symbol of string
+  | Bool of bool
   | Cons of expr * expr
   | If of expr * expr * expr
    and symbol_value =
@@ -27,6 +28,14 @@ let rec nth expr k =
     Cons(e1, e2) -> if k = 0 then e1 else nth e2 (k - 1)
   | _ -> Nil
 
+let is_false expr =
+  match expr with
+  | Bool false -> true
+  | _ -> false
+
+let is_true expr =
+  (is_false expr) <> true
+
 let sym_string expr =
     match expr with
     | Symbol(s) -> s
@@ -34,9 +43,10 @@ let sym_string expr =
 
 let rec print x =
   match x with
-    Nil -> print_string "nil ()"
+    Nil -> print_string "nil"
   | Int i -> printf "int %d" i
   | Symbol s -> printf "symbol %s" s
+  | Bool v -> printf "bool %s" (if v then "#t" else "#f")
   | Cons(car, cdr) -> printf "("; print car; printf " . "; print cdr; printf ")"
   | If(cond, e1, e2) -> printf "if ["; print cond; printf " ] -> "; print e1; printf " | "; print e2
 
@@ -49,6 +59,7 @@ let rec _show x =
   match x with
     Nil -> printf "()"
   | Symbol s -> print_string s
+  | Bool v -> print_string (if v then "#t" else "#f")
   | Int i -> print_int i
   | Cons(car, cdr) -> printf "("; _show_list x; printf ")"
   | If(cond, e1, e2) -> printf "#<if>"
