@@ -6,8 +6,8 @@ exception Runtime_error  of string
 let error msg = raise (Runtime_error msg)
 
 let rec eval exp env =
-  print_string "now eval ";
-  Type.debug exp;
+  (* print_string "now eval "; *)
+  (* debug exp; *)
   match exp with
   | Nil | Int _ -> exp
   | Symbol s -> env_lookup !env s
@@ -17,6 +17,8 @@ let rec eval exp env =
     | Symbol "=" -> eval_equal exp env
     | Symbol "+" -> eval_add exp env
     | Symbol "-" -> eval_sub exp env
+    | Symbol "<" -> eval_less exp env
+    | Symbol ">" -> eval_larg exp env
     | Symbol "set!"  -> eval_assign exp env
     | Symbol "define" -> eval_define exp env
     | Symbol "and" -> eval_and exp env
@@ -30,7 +32,7 @@ let rec eval exp env =
     let args = cdr exp in
     let v1 = eval (car args) env and
         v2 = eval (car (cdr args)) env in
-    if Type.equal v1 v2 then Bool true else Bool false
+    if equal v1 v2 then Bool true else Bool false
   and
     eval_add exp env =
     let args = cdr exp in
@@ -50,26 +52,42 @@ let rec eval exp env =
         | Cons(a, l) ->
            sub l (res - (int_value (eval a env)))
         | _ -> Int res in
-      sub (cdr args)  (int_value (eval (car args) env))
+    sub (cdr args)  (int_value (eval (car args) env))
+  and
+    eval_less exp env =
+    let args = cdr exp in
+    let v1 = eval (nth args 0) env in
+    let v2 = eval (nth args 1) env in
+    match v1, v2 with
+    | Int(_v1), Int(_v2) -> if _v1 < _v2 then Bool true else Bool false
+    | _ -> Bool false
+  and
+    eval_larg exp env =
+    let args = cdr exp in
+    let v1 = eval (nth args 0) env in
+    let v2 = eval (nth args 1) env in
+    match v1, v2 with
+    | Int(_v1), Int(_v2) -> if _v1 > _v2 then Bool true else Bool false
+    | _ -> Bool false
   and
     eval_define exp env =
-    let name = Type.nth exp 1 in
-    let value = eval (Type.nth exp 2) env in
-    ignore(Env.env_set env (Type.sym_string name) value);
+    let name = nth exp 1 in
+    let value = eval (nth exp 2) env in
+    ignore(env_set env (sym_string name) value);
     value
   and
     eval_assign exp env =
-    let name = Type.sym_string (Type.nth exp 1) in
+    let name = sym_string (nth exp 1) in
     try
-      let _ = Env.global_lookup name in
-      let value = eval (Type.nth exp 2) env in
-      ignore(Env.env_set env name value);
+      let _ = global_lookup name in
+      let value = eval (nth exp 2) env in
+      ignore(env_set env name value);
       value
     with
-      Env.Env_error msg -> raise (Runtime_error  msg)
+      Env_error msg -> raise (Runtime_error  msg)
   and
     eval_and exp env =
-    let conds = Type.cdr exp in
+    let conds = cdr exp in
     let rec it exp =
       match exp with
       | Nil -> (Bool true)
@@ -80,7 +98,7 @@ let rec eval exp env =
     it conds
   and
     eval_or exp env =
-    let conds = Type.cdr exp in
+    let conds = cdr exp in
     let rec it exp =
       match exp with
       | Nil -> (Bool false)
@@ -91,7 +109,7 @@ let rec eval exp env =
     it conds
   and
     eval_begin exp env =
-    let exps = Type.cdr exp in
+    let exps = cdr exp in
     let rec it exp =
       match exp with
       | Cons(a, Nil) -> (eval a env)
@@ -107,19 +125,17 @@ let rec eval exp env =
     | _ -> eval exp2 env
   and
     eval_let exp env =
-    let bindings = Type.nth exp 1 and
-        body = Type.nth exp 2 in
+    let bindings = nth exp 1 and
+        body = nth exp 2 in
     let bind_var exp =
-      Type.sym_string (Type.car exp) in
+      sym_string (car exp) in
     let bind_val exp =
       (car (cdr exp)) in
-    let rec extend env exp =
+    let rec extend_it env exp =
       match exp with
-       Cons(a, Nil) -> Env.extend env (bind_var a) (bind_val a)
-      | Cons(a, l) -> begin
-          let _env = Env.extend env (bind_var a) (bind_val a) in
-          extend _env l
-        end
+       Cons(a, Nil) -> extend env (bind_var a) (bind_val a)
+      | Cons(a, left) ->
+          extend_it (extend env (bind_var a) (bind_val a)) left
       | _ -> (error "eval_let") in
-    let new_env = extend env bindings in
+    let new_env = extend_it env bindings in
     eval body new_env

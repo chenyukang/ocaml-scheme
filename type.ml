@@ -83,6 +83,6 @@ let rec _show x =
     | _ -> raise (Type_error "type error")
 
 let show x =
-  print_string "now: ";
+  print_string "$: ";
   _show x;
   print_newline()
