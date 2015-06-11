@@ -6,8 +6,6 @@ exception Runtime_error  of string
 let error msg = raise (Runtime_error msg)
 
 let rec eval exp env =
-  (* print_string "now eval "; *)
-  (* debug exp; *)
   match exp with
   | Nil | Int _ -> exp
   | Symbol s -> env_lookup !env s
