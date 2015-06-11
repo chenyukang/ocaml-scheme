@@ -36,6 +36,17 @@ let is_false expr =
 let is_true expr =
   (is_false expr) <> true
 
+let int_value expr =
+  match expr with
+  | Int v -> v
+  | _ -> raise (Type_error "int_value")
+
+let equal exp1 exp2 =
+  match exp1, exp2 with
+    Int(v1), Int(v2) -> v1 = v2
+  | Symbol(s1), Symbol(s2) -> s1 = s2
+  | _, _ -> false
+
 let sym_string expr =
     match expr with
     | Symbol(s) -> s
@@ -70,7 +81,6 @@ let rec _show x =
     | Cons(car, Nil) -> _show car
     | Cons(car, cdr) -> _show car; printf " . "; _show cdr
     | _ -> raise (Type_error "type error")
-
 
 let show x =
   print_string "now: ";
