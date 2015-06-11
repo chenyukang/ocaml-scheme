@@ -39,8 +39,7 @@ let rec eval exp env =
     let rec add exp res =
       match exp with
         Nil -> Int res
-      | Cons(a, l) ->
-         add l ((int_value (eval a env)) + res)
+      | Cons(a, l) -> add l ((int_value (eval a env)) + res)
       | _ -> Int res in
     add args 0
   and
@@ -49,8 +48,7 @@ let rec eval exp env =
     let rec sub exp res =
         match exp with
           Nil -> Int res
-        | Cons(a, l) ->
-           sub l (res - (int_value (eval a env)))
+        | Cons(a, l) -> sub l (res - (int_value (eval a env)))
         | _ -> Int res in
     sub (cdr args)  (int_value (eval (car args) env))
   and
@@ -79,7 +77,7 @@ let rec eval exp env =
     eval_assign exp env =
     let name = sym_string (nth exp 1) in
     try
-      let _ = global_lookup name in
+      let _ = env_lookup !env name in
       let value = eval (nth exp 2) env in
       ignore(env_set env name value);
       value
