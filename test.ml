@@ -1,5 +1,6 @@
 open Type
 open Env
+open Eval
 open Printf
 
 (* The tests *)
@@ -28,11 +29,24 @@ let test_env_extend() =
   OUnit.assert_equal 1 (int_value (env_lookup !res "hello"));
   OUnit.assert_equal false (env_dont_have res "hello")
 
+let run str =
+  let e = Parser.expr Lexer.token (Lexing.from_string str) in
+  eval e Env.global_env
+
+let test_eval() =
+  let r1 = run "(+ 1 2)" and
+      r2 = run "(+ 1 2 3)" and
+      r3 = run "(< 1 2)" in
+  OUnit.assert_equal 3 (int_value r1);
+  OUnit.assert_equal 6 (int_value r2);
+  OUnit.assert_equal true (is_true r3)
+
 
 let test_unit = [
     "Type" , `Quick, test_type;
     "Env", `Slow , test_env ;
     "Env-extend", `Slow, test_env_extend;
+    "Eval", `Slow, test_eval;
   ]
 
 (* Run it *)
