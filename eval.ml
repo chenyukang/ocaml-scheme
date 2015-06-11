@@ -37,9 +37,8 @@ let rec eval exp env =
     let rec add exp res =
       match exp with
         Nil -> Int res
-      | Cons(a, Nil) -> Int ((int_value (eval a env)) + res)
-      | Cons(a, Cons(_, _)) ->
-         add (cdr exp) ((int_value (eval a env)) + res)
+      | Cons(a, l) ->
+         add l ((int_value (eval a env)) + res)
       | _ -> Int res in
     add args 0
   and
@@ -48,9 +47,8 @@ let rec eval exp env =
     let rec sub exp res =
         match exp with
           Nil -> Int res
-        | Cons(a, Nil) -> Int (res - (int_value (eval a env)))
-        | Cons(a, Cons(_, _)) ->
-           sub (cdr exp) (res - (int_value (eval a env)))
+        | Cons(a, l) ->
+           sub l (res - (int_value (eval a env)))
         | _ -> Int res in
       sub (cdr args)  (int_value (eval (car args) env))
   and
@@ -97,9 +95,9 @@ let rec eval exp env =
     let rec it exp =
       match exp with
       | Cons(a, Nil) -> (eval a env)
-      | Cons(a, Cons(_, _)) -> begin
+      | Cons(a, l) -> begin
           ignore (eval a env);
-          (it (Type.cdr exp)) end
+          (it l) end
       | _ -> (error "eval_begin") in
     it exps
   and
@@ -118,9 +116,9 @@ let rec eval exp env =
     let rec extend env exp =
       match exp with
        Cons(a, Nil) -> Env.extend env (bind_var a) (bind_val a)
-      | Cons(a, Cons(_, _)) -> begin
+      | Cons(a, l) -> begin
           let _env = Env.extend env (bind_var a) (bind_val a) in
-          extend _env (Type.cdr exp)
+          extend _env l
         end
       | _ -> (error "eval_let") in
     let new_env = extend env bindings in
