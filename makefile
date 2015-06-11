@@ -5,17 +5,20 @@ SOURCES = \
     scheme.ml \
     lexer.mll
 
-OCAMLBUILD=ocamlbuild
+OCAMLBUILD=ocamlbuild -pkg alcotest
 
 default: byte
 
-all: byte native
+all: byte native test
 
 byte:
 	$(OCAMLBUILD) $(TARGET).byte
 
 native:
 	$(OCAMLBUILD) $(TARGET).native
+
+test:
+	$(OCAMLBUILD) test.byte; ./test.byte
 
 clean:
 	$(OCAMLBUILD) -clean

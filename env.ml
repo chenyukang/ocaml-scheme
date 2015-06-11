@@ -15,7 +15,6 @@ let env_lookup env name =
   with Not_found ->
     error (Printf.sprintf "%s: not found in env" name)
 
-
 let global_lookup name =
   env_lookup !global_env name
 
