@@ -37,11 +37,13 @@ let test_eval() =
   let r1 = run "(+ 1 2)" and
       r2 = run "(+ 1 2 3)" and
       r3 = run "(< 1 2)" and
-      r4 = run "(let ((x 1) (y 2) (z 3)) (+ x y z))" in
+      r4 = run "(let ((x 1) (y 2) (z 3)) (+ x y z))" and
+      r5 = run "(or #t #t #t)" in
   OUnit.assert_equal 3 (int_value r1);
   OUnit.assert_equal 6 (int_value r2);
   OUnit.assert_equal true (is_true r3);
-  OUnit.assert_equal 6 (int_value r4)
+  OUnit.assert_equal 6 (int_value r4);
+  OUnit.assert_equal true (is_true r5)
 
 
 
