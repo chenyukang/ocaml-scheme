@@ -36,17 +36,20 @@ let run str =
 let test_eval() =
   let r1 = run "(+ 1 2)" and
       r2 = run "(+ 1 2 3)" and
-      r3 = run "(< 1 2)" in
+      r3 = run "(< 1 2)" and
+      r4 = run "(let ((x 1) (y 2) (z 3)) (+ x y z))" in
   OUnit.assert_equal 3 (int_value r1);
   OUnit.assert_equal 6 (int_value r2);
-  OUnit.assert_equal true (is_true r3)
+  OUnit.assert_equal true (is_true r3);
+  OUnit.assert_equal 6 (int_value r4)
+
 
 
 let test_unit = [
     "Type" , `Quick, test_type;
-    "Env", `Slow , test_env ;
-    "Env-extend", `Slow, test_env_extend;
-    "Eval", `Slow, test_eval;
+    "Env", `Quick , test_env ;
+    "Env-extend", `Quick, test_env_extend;
+    "Eval", `Quick, test_eval;
   ]
 
 (* Run it *)
