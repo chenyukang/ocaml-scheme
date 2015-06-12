@@ -9,8 +9,7 @@ rule token = parse
          | ['0'-'9']+           { INT (int_of_string(Lexing.lexeme lexbuf)) }
          | "#t"               { TRUE }
          | "#f"               { FALSE }
-         | "if"               { IF }                              
-         | "lambda"           { LAMBDA }
+         | "if"               { IF }
          | [^'(' ')' '0' - '9' ' ' '\t' '\n' '.' '\''][^' ' '\t' '\n' '(' ')']* { SYMBOL(Lexing.lexeme lexbuf) }
          | '('                { LPAREN }
          | ')'                { RPAREN }

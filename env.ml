@@ -42,6 +42,7 @@ let rec env_debug env =
   | _ -> Printf.printf "end\n"
 
 let extend env name value =
+  debug "extend" value;
   let res = ref !env in
   ignore(env_set res name value);
   res

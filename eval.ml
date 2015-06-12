@@ -6,10 +6,10 @@ exception Runtime_error  of string
 let error msg = raise (Runtime_error msg)
 
 let rec eval exp env =
+  debug "eval" exp;
   match exp with
-  | Nil | Int _ -> exp
+  | Nil | Int _ | Bool _  -> exp
   | Symbol s -> env_lookup !env s
-  | Bool v -> Bool v
   | Cons(e1, e2) -> (
     match e1 with
     | Symbol "=" -> eval_equal exp env
@@ -23,8 +23,14 @@ let rec eval exp env =
     | Symbol "or" -> eval_or exp env
     | Symbol "begin" -> eval_begin exp env
     | Symbol "let" -> eval_let exp env
-    | _ -> Symbol "uneval-cons")
+    | Symbol "lambda" -> eval_lambda exp env
+    | _  -> (
+      let e = eval e1 env in
+      match e with
+      | Lambda(_, _, env) -> eval_apply e e2 env
+      | _ -> Symbol "uneval-app"))
   | If(cond, exp1, exp2) -> eval_if cond exp1 exp2 env
+  | Lambda(var, body, _) -> exp
   and
     eval_equal exp env =
     let args = cdr exp in
@@ -135,3 +141,23 @@ let rec eval exp env =
       | _ -> (error "eval_let") in
     let new_env = extend_it env bindings in
     eval body new_env
+  and
+    eval_lambda exp env =
+    let vars = nth exp 1 and
+        body = (cdr (cdr exp)) in
+    Lambda(vars, body, env)
+  and
+    eval_apply lambda args env =
+    let vars = lambda_vars lambda and
+        body = lambda_body lambda in
+    let rec extend_it env vars args =
+      match vars with
+        Nil -> env
+      | Cons(a, Nil) ->  extend env (sym_string a) (car args)
+      | Cons(a, left) ->
+         extend_it (extend env (sym_string a) (car args))
+                   left (cdr args)
+      | _ -> (error "eval_apply") in
+    let new_env = extend_it env vars args in
+    let exe = Cons(Symbol("begin"), body) in
+    eval exe new_env;

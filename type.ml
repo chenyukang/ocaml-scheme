@@ -1,6 +1,7 @@
 open Printf
 exception Type_error of string
 
+
 type expr =
   Nil
   | Int of int
@@ -8,6 +9,7 @@ type expr =
   | Bool of bool
   | Cons of expr * expr
   | If of expr * expr * expr
+  | Lambda of expr * expr * (symbol list) ref
    and symbol_value =
      Value of expr
    and
@@ -21,6 +23,16 @@ let car expr =
 let cdr expr =
   match expr with
   | Cons(e1, e2) -> e2
+  | _ -> Nil
+
+let lambda_vars expr =
+  match expr with
+  | Lambda(vars, _, _) -> vars
+  | _ -> Nil
+
+let lambda_body expr =
+  match expr with
+  | Lambda(_, body, _) -> body
   | _ -> Nil
 
 let rec nth expr k =
@@ -60,9 +72,10 @@ let rec print x =
   | Bool v -> printf "bool %s" (if v then "#t" else "#f")
   | Cons(car, cdr) -> printf "("; print car; printf " . "; print cdr; printf ")"
   | If(cond, e1, e2) -> printf "if ["; print cond; printf " ] -> "; print e1; printf " | "; print e2
+  | Lambda(vars, body, env) -> printf "#proc"
 
-let debug x =
-  print_string "debug: ";
+let debug str x =
+  Printf.printf "debug %s: " str;
   print x;
   print_newline()
 
@@ -74,6 +87,7 @@ let rec _show x =
   | Int i -> print_int i
   | Cons(car, cdr) -> printf "("; _show_list x; printf ")"
   | If(cond, e1, e2) -> printf "#<if>"
+  | Lambda(vars, body, env) -> printf "#<proc>"
   and _show_list x =
     match x with
       Cons(car, Cons(e1, e2)) -> ( _show car; printf " ";
