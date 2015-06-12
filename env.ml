@@ -1,4 +1,5 @@
 open Type
+open Printf
 
 exception Env_error of string
 let error msg = raise (Env_error msg)
@@ -13,7 +14,7 @@ let env_lookup env name =
     match r with
       { name = _; value = v } -> v
   with Not_found ->
-    error (Printf.sprintf "%s: not found in env" name)
+    error (sprintf "%s: not found in env" name)
 
 let global_lookup name =
   env_lookup !global_env name
@@ -34,12 +35,12 @@ let global_set name value =
 
 let rec env_debug env =
   match env with
-  | x :: [] -> Printf.printf "now: %s\n" x.name
+  | x :: [] -> printf "now: %s\n" x.name
   | x :: tl -> begin
-      Printf.printf "now: %s\n" x.name;
+      printf "now: %s\n" x.name;
       env_debug tl;
     end
-  | _ -> Printf.printf "end\n"
+  | _ -> printf "end\n"
 
 let extend env name value =
   debug "extend" value;
