@@ -17,7 +17,6 @@
 %left TIMES DIV MOD
 
 %%
-
 expr:
       INT                             { Type.Int($1) }
    |  SYMBOL                          { Type.Symbol($1) }
