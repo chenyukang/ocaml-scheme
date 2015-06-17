@@ -15,6 +15,7 @@ let rec eval exp env =
     | Symbol "=" -> eval_equal exp env
     | Symbol "+" -> eval_add exp env
     | Symbol "-" -> eval_sub exp env
+    | Symbol "*" -> eval_mul exp env
     | Symbol "<" -> eval_less exp env
     | Symbol ">" -> eval_larg exp env
     | Symbol "set!"  -> eval_assign exp env
@@ -27,7 +28,7 @@ let rec eval exp env =
     | _  -> (
       let e = eval e1 env in
       match e with
-      | Lambda(_, _, env) -> eval_apply e e2 env
+      | Lambda(_, _, save_env) -> eval_apply e e2 (merge_env save_env env)
       | _ -> Symbol "uneval-app"))
   | If(cond, exp1, exp2) -> eval_if cond exp1 exp2 env
   | Lambda(var, body, _) -> exp
@@ -56,6 +57,15 @@ let rec eval exp env =
         | _ -> Int res in
     sub (cdr args)  (int_value (eval (car args) env))
   and
+    eval_mul exp env =
+    let args = cdr exp in
+    let rec mul exp res =
+      match exp with
+        Nil -> Int res
+      | Cons(a, l) -> mul l (res * (int_value (eval a env)))
+      | _ -> Int res in
+    mul (cdr args)  (int_value (eval (car args) env))
+  and
     eval_less exp env =
     let args = cdr exp in
     let v1 = eval (nth args 0) env in
@@ -74,9 +84,25 @@ let rec eval exp env =
   and
     eval_define exp env =
     let name = nth exp 1 in
-    let value = eval (nth exp 2) env in
-    ignore(env_set env (sym_string name) value);
-    value
+    debug "eval_define: " name;
+    match name with
+    (* define a simple variable *)
+    | Symbol v -> (
+      let value = eval (nth exp 2) env in 
+      ignore(env_set env v value);
+      value
+    )
+    (* define a lambda *)
+    | Cons(v, left) -> (  
+      let def = nth exp 1 in
+      let def_name = (sym_string (car def)) in
+      let def_vars = cdr def in
+      let body = (cdr (cdr exp)) in
+      let lambda = Lambda(def_vars, body, env) in 
+      ignore(env_set env def_name lambda);
+      lambda;
+    )
+    | _ -> (error "eval_define")
   and
     eval_assign exp env =
     let name = sym_string (nth exp 1) in
@@ -132,7 +158,7 @@ let rec eval exp env =
     let bind_var exp =
       sym_string (car exp) in
     let bind_val exp =
-      (car (cdr exp)) in
+      eval (car (cdr exp)) env in
     let rec extend_it env exp =
       match exp with
        Cons(a, Nil) -> extend env (bind_var a) (bind_val a)
@@ -153,9 +179,9 @@ let rec eval exp env =
     let rec extend_it env vars args =
       match vars with
         Nil -> env
-      | Cons(a, Nil) ->  extend env (sym_string a) (car args)
+      | Cons(a, Nil) ->  extend env (sym_string a) (eval (car args) env)
       | Cons(a, left) ->
-         extend_it (extend env (sym_string a) (car args))
+         extend_it (extend env (sym_string a) (eval (car args) env))
                    left (cdr args)
       | _ -> (error "eval_apply") in
     let new_env = extend_it env vars args in

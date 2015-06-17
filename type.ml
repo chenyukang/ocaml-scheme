@@ -47,6 +47,11 @@ let is_false expr =
 let is_true expr =
   (is_false expr) <> true
 
+let is_proc expr =
+  match expr with
+  | Lambda(_, _, _) -> true
+  | _ -> false
+           
 let int_value expr =
   match expr with
   | Int v -> v

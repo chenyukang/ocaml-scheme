@@ -26,10 +26,15 @@ let env_set env name value =
             !env with
       x -> x.value <- value ; x.value
   with Not_found ->
-    let symbol = { name = name ; value = value }
-    in env := symbol :: !env ;
-       value;;
+    let symbol = { name = name ; value = value } in 
+    env := symbol :: !env ;
+    value;;
 
+let env_ext env name value =
+  let symbol = { name = name; value = value} in
+  env := symbol :: !env;
+  value;;
+  
 let global_set name value =
   env_set global_env name value
 
@@ -43,10 +48,20 @@ let rec env_debug env =
   | _ -> printf "end\n"
 
 let extend env name value =
+  printf "extend-var: %s\n" name;
   debug "extend" value;
   let res = ref !env in
-  ignore(env_set res name value);
+  ignore(env_ext res name value);
   res
 
+let merge_env env1 env2 =
+  let merge = List.append !env1 !env2 in 
+  let res = ref merge in
+  res
+    
 let env_init() =
   global_env := { name = "a"; value = Int(2) } :: !global_env
+
+let env_clear env =
+  env := []
+  
