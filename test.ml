@@ -41,8 +41,12 @@ let test_eval() =
   (run "(let ((x 1) (y 2) (z (+ 1 3))) (+ x y z))" int_value 7);
   (run "(- (+ 3 (* 8 5)) 1)" int_value 42);
   (run "(< 1 2)" is_true true);
-  (run "(or #t #t #t)" is_true true);;
-  
+  (run "(or #t #t #t)" is_true true);
+  (run "(or)" is_true false);
+  (run "(and #t #t #f)" is_true false);
+  (run "(and)" is_true true);
+  (run "(and #t #t #t)" is_true true);;
+
 let test_define() =
   env_clear global_env;
   (run "(define a 1)" int_value 1);
@@ -55,19 +59,19 @@ let test_func() =
   (run "(a 2 1)" is_true false);
   (run "(define (fact x) (if (= x 0) 1  (* x (fact (- x 1)))))" is_proc true);
   (run "(fact 5)" int_value 120);;
-  
+
 let test_lambda() =
   env_clear global_env;
   (run "((lambda(a b) (+ a b)) 1 2)" int_value 3);
   (run "((lambda(x) (+ x 1)) 1)" int_value 2);
   (run "(let ((fu (lambda (x) (+ x 1)))) (fu 1))" int_value 2);
-  (run "((lambda (x y ) (if (= y 0) 1 (* y (x x (- y 1))))) 
+  (run "((lambda (x y ) (if (= y 0) 1 (* y (x x (- y 1)))))
         (lambda (x y ) (if ( = y 0) 1 (* y (x x (- y 1))))) 5)" int_value (5 * 4 * 3 * 2));;
 
 let test_lambda_scope() =
   (run "(define foo (let ((x 4)) (lambda (y) (+ x y))))" is_proc true);
   (run "(foo 6)" int_value 10);;
-  
+
 let test_unit = [
     "Type" , `Quick, test_type;
     "Env", `Quick , test_env ;

@@ -87,7 +87,7 @@ let rec eval exp env =
     debug "eval_define: " name;
     match name with
     (* define a simple variable *)
-    | Symbol v -> (
+    | Symbol(v) -> (
       let value = eval (nth exp 2) env in
       ignore(env_set env v value);
       value
@@ -100,7 +100,7 @@ let rec eval exp env =
       let body = (cdr (cdr exp)) in
       let lambda = Lambda(def_vars, body, env) in
       ignore(env_set env def_name lambda);
-      lambda;
+      lambda
     )
     | _ -> (error "eval_define")
   and
@@ -118,22 +118,22 @@ let rec eval exp env =
     let conds = cdr exp in
     let rec it exp =
       match exp with
-      | Nil -> (Bool true)
-      | Cons(a, Nil) -> (eval a env)
-      | _ -> match (eval (car exp) env) with
-             | Bool false -> Bool false
-             | _ -> it (cdr exp) in
+        Cons(a, left) -> (
+        match (eval a env) with
+          Bool false -> Bool false
+        | _ -> it left)
+      | _ -> Bool true in
     it conds
   and
     eval_or exp env =
     let conds = cdr exp in
     let rec it exp =
       match exp with
-      | Nil -> (Bool false)
-      | Cons(a, Nil) -> (eval a env)
-      | _ -> match (eval (car exp) env) with
-             | Bool true -> Bool true
-             | _ -> it (cdr exp) in
+        Cons(a, left) -> (
+        match (eval a env) with
+          Bool true -> Bool true
+        | _ -> it left)
+      | _ -> Bool false in
     it conds
   and
     eval_begin exp env =
