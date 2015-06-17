@@ -44,7 +44,7 @@ let rec eval exp env =
     let rec add exp res =
       match exp with
         Nil -> Int res
-      | Cons(a, l) -> add l ((int_value (eval a env)) + res)
+      | Cons(a, l) -> add l (res + (int_value (eval a env)))
       | _ -> Int res in
     add args 0
   and
@@ -88,17 +88,17 @@ let rec eval exp env =
     match name with
     (* define a simple variable *)
     | Symbol v -> (
-      let value = eval (nth exp 2) env in 
+      let value = eval (nth exp 2) env in
       ignore(env_set env v value);
       value
     )
     (* define a lambda *)
-    | Cons(v, left) -> (  
+    | Cons(v, left) -> (
       let def = nth exp 1 in
       let def_name = (sym_string (car def)) in
       let def_vars = cdr def in
       let body = (cdr (cdr exp)) in
-      let lambda = Lambda(def_vars, body, env) in 
+      let lambda = Lambda(def_vars, body, env) in
       ignore(env_set env def_name lambda);
       lambda;
     )
@@ -161,9 +161,10 @@ let rec eval exp env =
       eval (car (cdr exp)) env in
     let rec extend_it env exp =
       match exp with
-       Cons(a, Nil) -> extend env (bind_var a) (bind_val a)
-      | Cons(a, left) ->
-          extend_it (extend env (bind_var a) (bind_val a)) left
+        Cons(a, left) -> (
+        let new_env = extend env (bind_var a) (bind_val a) in
+        if left = Nil then new_env
+        else extend_it new_env left)
       | _ -> (error "eval_let") in
     let new_env = extend_it env bindings in
     eval body new_env
@@ -179,10 +180,10 @@ let rec eval exp env =
     let rec extend_it env vars args =
       match vars with
         Nil -> env
-      | Cons(a, Nil) ->  extend env (sym_string a) (eval (car args) env)
-      | Cons(a, left) ->
-         extend_it (extend env (sym_string a) (eval (car args) env))
-                   left (cdr args)
+      | Cons(Symbol(a), left) -> (
+        let new_env =  extend env a (eval (car args) env) in
+        if left = Nil then new_env
+        else extend_it new_env left (cdr args))
       | _ -> (error "eval_apply") in
     let new_env = extend_it env vars args in
     let exe = Cons(Symbol("begin"), body) in
