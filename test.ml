@@ -41,6 +41,7 @@ let test_eval() =
   (run "(let ((x 1) (y 2) (z (+ 1 3))) (+ x y z))" int_value 7);
   (run "(- (+ 3 (* 8 5)) 1)" int_value 42);
   (run "(< 1 2)" is_true true);
+  (run "(/ 4 2 2)" int_value 1);
   (run "(or #t #t #t)" is_true true);
   (run "(or)" is_true false);
   (run "(and #t #t #f)" is_true false);
