@@ -5,8 +5,11 @@ open Printf
 exception Runtime_error  of string
 let error msg = raise (Runtime_error msg)
 
+let is_debug = ref false
+
 let rec eval exp env =
-  debug "eval" exp;
+  if !is_debug then
+    debug "eval" exp;
   match exp with
   | Nil | Int _ | Bool _  -> exp
   | Symbol s -> env_lookup !env s
@@ -16,6 +19,7 @@ let rec eval exp env =
     | Symbol "+" -> eval_add exp env
     | Symbol "-" -> eval_sub exp env
     | Symbol "*" -> eval_mul exp env
+    | Symbol "/" -> eval_div exp env
     | Symbol "<" -> eval_less exp env
     | Symbol ">" -> eval_larg exp env
     | Symbol "set!"  -> eval_assign exp env
@@ -65,6 +69,15 @@ let rec eval exp env =
       | Cons(a, l) -> mul l (res * (int_value (eval a env)))
       | _ -> Int res in
     mul (cdr args)  (int_value (eval (car args) env))
+  and
+    eval_div exp env =
+    let args = cdr exp in
+    let rec div exp res =
+      match exp with
+        Nil -> Int res
+      | Cons(a, l) -> div l (res / (int_value (eval a env)))
+      | _ -> Int res in
+    div (cdr args)  (int_value (eval (car args) env))
   and
     eval_less exp env =
     let args = cdr exp in

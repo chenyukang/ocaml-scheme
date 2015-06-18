@@ -80,7 +80,7 @@ let test_unit = [
     "Eval", `Quick, test_eval;
     "Eval-func", `Quick, test_func;
     "Eval-lambda", `Quick, test_lambda;
-    "Eval-lambda_scope", `Quick, test_lambda_scope;
+    "Eval-lambda-scope", `Quick, test_lambda_scope;
   ]
 
 (* Run it *)
