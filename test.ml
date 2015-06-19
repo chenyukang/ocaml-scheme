@@ -7,7 +7,6 @@ open Printf
 let test_type () =
   OUnit.assert_equal true (is_false (Type.Bool false))
 
-
 let env_dont_have env v =
   try
     ignore(env_lookup !env v);
