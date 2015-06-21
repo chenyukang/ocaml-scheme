@@ -1,6 +1,9 @@
 open Printf
 exception Type_error of string
 
+let demo a b =
+  a + b
+
 type expr =
   Nil
   | Int of int
@@ -9,6 +12,7 @@ type expr =
   | Cons of expr * expr
   | If of expr * expr * expr
   | Lambda of expr * expr * (symbol list) ref
+  | Primitive of (expr -> (symbol list) ref -> expr)
    and symbol_value =
      Value of expr
    and
@@ -51,7 +55,7 @@ let is_proc expr =
   match expr with
   | Lambda(_, _, _) -> true
   | _ -> false
-           
+
 let int_value expr =
   match expr with
   | Int v -> v
@@ -77,6 +81,7 @@ let rec print x =
   | Cons(car, cdr) -> printf "("; print car; printf " . "; print cdr; printf ")"
   | If(cond, e1, e2) -> printf "if ["; print cond; printf " ] -> "; print e1; printf " | "; print e2
   | Lambda(vars, body, env) -> printf "#proc"
+  | Primitive _ -> printf "#primitive-proc"
 
 let debug str x =
   Printf.printf "debug %s: " str;
@@ -92,6 +97,7 @@ let rec _show x =
   | Cons(car, cdr) -> printf "("; _show_list x; printf ")"
   | If(cond, e1, e2) -> printf "#<if>"
   | Lambda(vars, body, env) -> printf "#<proc>"
+  | Primitive _ -> printf "#primitive-proc"
   and _show_list x =
     match x with
       Cons(car, Cons(e1, e2)) -> ( _show car; printf " ";

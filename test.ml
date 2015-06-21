@@ -31,7 +31,10 @@ let test_env_extend() =
 
 let run str trans expect =
   let e = Parser.expr Lexer.token (Lexing.from_string str) in
-  (OUnit.assert_equal expect (trans (eval e Env.global_env)))
+  begin
+      init_primitive();
+      (OUnit.assert_equal expect (trans (eval e Env.global_env)));
+  end;;
 
 let test_eval() =
   env_clear global_env;

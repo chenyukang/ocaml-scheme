@@ -16,6 +16,7 @@ let eval_expr str env =
 
 let run_with input =
   Env.env_init();
+  Eval.init_primitive();
   try
     while true do
       output_string stdout "$-> ";
@@ -47,7 +48,6 @@ let load_file file =
     End_of_file -> ( (* print_string !str; *)
     eval_expr !str Env.global_env;
   )
-
 
 let main =
   begin
