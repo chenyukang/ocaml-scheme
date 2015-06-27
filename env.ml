@@ -26,6 +26,7 @@ let env_set env name value =
             !env with
       x -> x.value <- value ; x.value
   with Not_found ->
+    printf "add : %s\n" name;
     let symbol = { name = name ; value = value } in
     env := symbol :: !env ;
     value;;
@@ -56,9 +57,6 @@ let extend env name value =
 
 let merge_env env1 env2 =
   ref (List.append !env1 !env2);;
-
-let env_init() =
-  global_env := { name = "a"; value = Int(2) } :: !global_env
 
 let env_clear env =
   env := []

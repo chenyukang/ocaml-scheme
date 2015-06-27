@@ -15,8 +15,7 @@ let eval_expr str env =
   | Parsing.Parse_error -> print_endline "Syntax error."
 
 let run_with input =
-  Env.env_init();
-  Eval.init_primitive();
+  Eval.init_env();
   try
     while true do
       output_string stdout "$-> ";

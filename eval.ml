@@ -21,6 +21,7 @@ let rec eval exp env =
     | Symbol "lambda" -> eval_lambda exp env
     | _  -> (
       let app = eval e1 env in
+      debug "now:::" app;
       match app with
       | Lambda(_, _, save_env) ->
          eval_apply app e2 (merge_env save_env env)
@@ -181,13 +182,29 @@ let eval_or args env =
     | _ -> Bool false in
   it args;;
 
-let init_primitive() =
-  ignore(Env.global_set "=" (Primitive eval_equal));
-  ignore(Env.global_set "+" (Primitive eval_add));
-  ignore(Env.global_set "-" (Primitive eval_sub));
-  ignore(Env.global_set "*" (Primitive eval_mul));
-  ignore(Env.global_set "/" (Primitive eval_div));
-  ignore(Env.global_set "<" (Primitive eval_less));
-  ignore(Env.global_set ">" (Primitive eval_larg));
-  ignore(Env.global_set "and" (Primitive eval_and));
-  ignore(Env.global_set "or" (Primitive eval_or));;
+let eval_is_boolean arg env =
+  let res = is_boolean (eval (car arg) env) in
+  Bool res;;
+
+let query_proc test_func: (expr -> (symbol list) ref -> expr) =
+  let res = fun arg env ->
+    let v = test_func (eval (car arg) env) in
+    Bool v in
+  res
+
+let init_env() =
+  let add_primitive name proc =
+    ignore(Env.global_set name (Primitive proc)) in
+  add_primitive "=" eval_equal;
+  add_primitive "+" eval_add;
+  add_primitive "-" eval_sub;
+  add_primitive "*" eval_mul;
+  add_primitive "/" eval_div;
+  add_primitive "<" eval_less;
+  add_primitive ">" eval_larg;
+  add_primitive "and" eval_and;
+  add_primitive "or" eval_or;
+  add_primitive "boolean?" (query_proc is_boolean);
+  add_primitive "bool?" (query_proc is_boolean);
+  add_primitive "integer?" (query_proc is_integer);
+  add_primitive "pair?" (query_proc is_pair);;

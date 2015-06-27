@@ -1,9 +1,6 @@
 open Printf
 exception Type_error of string
 
-let demo a b =
-  a + b
-
 type expr =
   Nil
   | Int of int
@@ -56,10 +53,30 @@ let is_proc expr =
   | Lambda(_, _, _) -> true
   | _ -> false
 
+let is_boolean expr =
+  match expr with
+  | Bool _ -> true
+  | _ -> false
+
+let is_integer expr =
+  match expr with
+  | Int _ -> true
+  | _ -> false
+
+let is_pair expr =
+  match expr with
+  | Cons(_, _) -> true
+  | _ -> false
+
 let int_value expr =
   match expr with
   | Int v -> v
   | _ -> raise (Type_error "int_value")
+
+let bool_value expr =
+  match expr with
+  | Bool v -> v
+  | _ -> raise (Type_error "bool_value")
 
 let equal exp1 exp2 =
   match exp1, exp2 with

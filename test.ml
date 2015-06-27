@@ -5,7 +5,7 @@ open Printf
 
 (* The tests *)
 let test_type () =
-  OUnit.assert_equal true (is_false (Type.Bool false))
+  OUnit.assert_equal false (bool_value (Bool false));;
 
 let env_dont_have env v =
   try
@@ -13,7 +13,7 @@ let env_dont_have env v =
     false
   with
     Env_error msg -> true
-  | _ -> false
+  | _ -> false;;
 
 let test_env () =
   let env = ref !global_env in
@@ -32,8 +32,9 @@ let test_env_extend() =
 let run str trans expect =
   let e = Parser.expr Lexer.token (Lexing.from_string str) in
   begin
-      init_primitive();
-      (OUnit.assert_equal expect (trans (eval e Env.global_env)));
+    init_env();
+    let res = eval e Env.global_env in
+    (OUnit.assert_equal expect (trans res));
   end;;
 
 let test_eval() =
@@ -43,13 +44,13 @@ let test_eval() =
   (run "(let ((x 1) (y 2) (z 3)) (+ x y z))" int_value 6);
   (run "(let ((x 1) (y 2) (z (+ 1 3))) (+ x y z))" int_value 7);
   (run "(- (+ 3 (* 8 5)) 1)" int_value 42);
-  (run "(< 1 2)" is_true true);
+  (run "(< 1 2)" bool_value true);
   (run "(/ 4 2 2)" int_value 1);
-  (run "(or #t #t #t)" is_true true);
-  (run "(or)" is_true false);
-  (run "(and #t #t #f)" is_true false);
-  (run "(and)" is_true true);
-  (run "(and #t #t #t)" is_true true);;
+  (run "(or #t #t #t)" bool_value true);
+  (run "(or)" bool_value false);
+  (run "(and #t #t #f)" bool_value false);
+  (run "(and)" bool_value true);
+  (run "(and #t #t #t)" bool_value true);;
 
 let test_define() =
   env_clear global_env;
@@ -59,8 +60,8 @@ let test_define() =
 let test_func() =
   env_clear global_env;
   (run "(define a (lambda(a b) (< a b)))" is_proc true);
-  (run "(a 1 2)" is_true true);
-  (run "(a 2 1)" is_true false);
+  (run "(a 1 2)" bool_value true);
+  (run "(a 2 1)" bool_value false);
   (run "(define (fact x) (if (= x 0) 1  (* x (fact (- x 1)))))" is_proc true);
   (run "(fact 5)" int_value 120);;
 
@@ -76,11 +77,22 @@ let test_lambda_scope() =
   (run "(define foo (let ((x 4)) (lambda (y) (+ x y))))" is_proc true);
   (run "(foo 6)" int_value 10);;
 
+let test_primitive() =
+  (run "(boolean? #t)"  bool_value true);
+  (run "(boolean? 1)" bool_value false);
+  (run "(boolean? (= 1 2))" bool_value true);
+  (run "(integer? 1)" bool_value true);
+  (run "(integer? (+ 1 2 3))" bool_value true);
+  (run "(integer? (= 1 2))" bool_value false);;
+  (run "(pair? (+ 1 2 3))" bool_value false);;
+
+
 let test_unit = [
     "Type" , `Quick, test_type;
     "Env", `Quick , test_env ;
     "Env-extend", `Quick, test_env_extend;
     "Def", `Quick, test_define;
+    "Primitive", `Quick, test_primitive;
     "Eval", `Quick, test_eval;
     "Eval-func", `Quick, test_func;
     "Eval-lambda", `Quick, test_lambda;
