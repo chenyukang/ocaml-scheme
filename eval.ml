@@ -21,7 +21,7 @@ let rec eval exp env =
     | Symbol "lambda" -> eval_lambda exp env
     | _  -> (
       let app = eval e1 env in
-      debug "now:::" app;
+      debug "now::" app;
       match app with
       | Lambda(_, _, save_env) ->
          eval_apply app e2 (merge_env save_env env)
@@ -117,6 +117,7 @@ let eval_equal args env =
   if equal v1 v2 then Bool true else Bool false;;
 
 let eval_add args env =
+  debug "eval_add:" args;
   let rec add exp res =
     match exp with
       Nil -> Int res
@@ -177,10 +178,27 @@ let eval_or args env =
     match exp with
       Cons(a, left) -> (
       match (eval a env) with
-        Bool true -> Bool true
+      | Bool true -> Bool true
       | _ -> it left)
     | _ -> Bool false in
   it args;;
+
+let eval_list args env =
+  let rec it exp =
+    match exp with
+      Cons(a, left) -> Cons((eval a env), (it (cdr exp)))
+    | _ -> Nil in
+  it args;;
+
+let eval_car args env =
+  match (eval (car args) env) with
+    Cons(a, left) -> a
+  | _ -> (error "eval_car");;
+
+let eval_cdr args env =
+  match (eval (car args) env) with
+    Cons(a, left) -> left
+  | _ -> (error "eval_cdr");;
 
 let eval_is_boolean arg env =
   let res = is_boolean (eval (car arg) env) in
@@ -204,6 +222,9 @@ let init_env() =
   add_primitive ">" eval_larg;
   add_primitive "and" eval_and;
   add_primitive "or" eval_or;
+  add_primitive "list" eval_list;
+  add_primitive "car" eval_car;
+  add_primitive "cdr" eval_cdr;
   add_primitive "boolean?" (query_proc is_boolean);
   add_primitive "bool?" (query_proc is_boolean);
   add_primitive "integer?" (query_proc is_integer);

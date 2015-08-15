@@ -2,7 +2,7 @@ open Printf
 exception Type_error of string
 
 type expr =
-  Nil
+  | Nil
   | Int of int
   | Symbol of string
   | Bool of bool

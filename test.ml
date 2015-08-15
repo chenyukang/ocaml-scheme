@@ -73,6 +73,12 @@ let test_lambda() =
   (run "((lambda (x y ) (if (= y 0) 1 (* y (x x (- y 1)))))
         (lambda (x y ) (if ( = y 0) 1 (* y (x x (- y 1))))) 5)" int_value (5 * 4 * 3 * 2));;
 
+let test_list() =
+  env_clear global_env;
+  (run "(car (list 1 2 3))" int_value 1);
+  (run "(car (cdr (list 1 2 3)))" int_value 2);
+  (run "(car (cdr (cdr (list 1 2 3))))" int_value 3);;
+
 let test_lambda_scope() =
   (run "(define foo (let ((x 4)) (lambda (y) (+ x y))))" is_proc true);
   (run "(foo 6)" int_value 10);;
@@ -97,6 +103,7 @@ let test_unit = [
     "Eval-func", `Quick, test_func;
     "Eval-lambda", `Quick, test_lambda;
     "Eval-lambda-scope", `Quick, test_lambda_scope;
+    "Eval-list", `Quick, test_list;
   ]
 
 (* Run it *)

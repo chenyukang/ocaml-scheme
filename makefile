@@ -5,7 +5,7 @@ SOURCES = \
     scheme.ml \
     lexer.mll
 
-OCAMLBUILD=ocamlbuild -pkg alcotest
+OCAMLBUILD = ocamlbuild -pkg alcotest
 
 default: byte
 
