@@ -31,10 +31,9 @@ let test_env_extend() =
 
 let run str trans expect =
   let e = Parser.expr Lexer.token (Lexing.from_string str) in
-  begin
-    init_env();
-    let res = eval e Env.global_env in
-    (OUnit.assert_equal expect (trans res));
+  begin init_env();
+        let res = eval e Env.global_env in
+        (OUnit.assert_equal expect (trans res));
   end;;
 
 let test_eval() =
@@ -108,6 +107,4 @@ let test_unit = [
 
 (* Run it *)
 let () =
-  Alcotest.run "My test" [
-                 "test_unit", test_unit;
-               ]
+  Alcotest.run "My test" [ "test_unit", test_unit; ]
